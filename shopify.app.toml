@@ -1,0 +1,27 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "sus-test"
+client_id = "04a1c23b3eecca7bc28c1b970f15c91e"
+application_url = "https://nutrition-appointed-budgets-beaches.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_customers, write_customers, read_products, write_products, read_orders, write_orders"
+
+[auth]
+redirect_urls = [
+  "https://nutrition-appointed-budgets-beaches.trycloudflare.com/auth/callback",
+  "https://nutrition-appointed-budgets-beaches.trycloudflare.com/auth/shopify/callback",
+  "https://nutrition-appointed-budgets-beaches.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "quickstart-63e217ee.myshopify.com"
