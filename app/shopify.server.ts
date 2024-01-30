@@ -24,10 +24,31 @@ const shopify = shopifyApp({
       deliveryMethod: DeliveryMethod.Http,
       callbackUrl: "/webhooks",
     },
+    ORDERS_CREATE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks",
+      callback: async (topic, shop, body, webhookId) => {
+        console.log("----Creating Order----");
+        const payload = JSON.parse(body);
+        console.log(payload);
+        console.log("----Order Created----");
+      },
+    },
+    // when a new customer is created
+    CUSTOMERS_CREATE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks",
+      callback: async (topic, shop, body, webhookId) => {
+        console.log("----Creating Customer----");
+        const payload = JSON.parse(body);
+        console.log(payload);
+        console.log("----Customer Created----");
+      },
+    },
   },
   hooks: {
     afterAuth: async ({ session }) => {
-      shopify.registerWebhooks({ session });
+      await shopify.registerWebhooks({ session });
     },
   },
   future: {

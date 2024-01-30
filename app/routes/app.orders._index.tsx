@@ -27,50 +27,96 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return null;
 };
 
+const users = [
+  {
+    id: 1,
+    name: "Kenneth",
+    lastName: "Olivas",
+    email: "kennetholivas1@gmail.com",
+  },
+  {
+    id: 2,
+    name: "Rodrigo",
+    lastName: "Calle",
+    email: "rodrigo.calle@meltstudio.co",
+  },
+];
+
+// export const action: ActionFunction = async ({ request }) => {
+//   const { admin, session } = await authenticate.admin(request);
+//   const { shop, accessToken } = session;
+//   console.log(shop, accessToken);
+//   const webhook = new admin.rest.resources.Webhook({ session: session });
+
+//   if (webhook) {
+//     console.log("Webhook fired", webhook);
+//     webhook.address = "pubsub://projectName:topicName";
+//     webhook.topic = "orders/create";
+//     webhook.format = "json";
+
+//     console.log("--------Webhook created---------", webhook);
+//     await webhook.save();
+//   }
+
+//   return null;
+// };
+
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
+  console.log({ session, admin });
   const data = {
-    ...Object.fromEntries(await request.formData())
+    ...Object.fromEntries(await request.formData()),
   } as unknown as Form;
   const order = new admin.rest.resources.Order({ session: session });
-  order.currency = "COP"
-  order.email = "kennetholivas1@gmail.com";
-  order.name = "Kenneth Olivas";
+  order.currency = "COP";
+  order.email = users[1].email;
+  order.name = `${users[1].name} ${users[1].lastName}`;
   order.customer = {
-    fisrt_name: "Kenneth",
-    last_name: "Olivas",
-  }
+    fisrt_name: users[1].name,
+    last_name: users[1].lastName,
+  };
   order.line_items = [
     {
-      "title": data.title,
-      "price": data.price,
-      "quantity": data.quantity,
-      "tax_lines": [
+      title: data.title,
+      price: data.price,
+      quantity: data.quantity,
+      tax_lines: [
         {
-          "price": 0,
-          "rate": 0,
-          "title": "State tax"
-        }
-      ]
-    }
-  ]
+          price: 0,
+          rate: 0,
+          title: "State tax",
+        },
+      ],
+    },
+  ];
 
   order.transactions = [
     {
-      "kind": "sale",
-      "status": "success",
-      "amount": data.price
-    }
+      kind: "sale",
+      status: "success",
+      amount: data.price,
+    },
   ];
 
   await order.save({
     update: true,
   });
 
+  // const webhook = new admin.rest.resources.Webhook({ session: session });
+
+  // if (webhook) {
+  //   console.log("Webhook fired", webhook);
+  //   webhook.address = "pubsub://projectName:topicName";
+  //   webhook.topic = "orders/create";
+  //   webhook.format = "json";
+
+  //   console.log("--------Webhook created---------", webhook);
+  //   await webhook.save();
+  // }
+
   return json({
     order: order,
   });
-
 };
 
 export default function Index() {
@@ -85,7 +131,7 @@ export default function Index() {
   const actionData = useActionData<typeof action>();
   const isLoading =
     ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
-  const orderId = actionData?.order.id
+  const orderId = actionData?.order.id;
   useEffect(() => {
     if (orderId) {
       shopify.toast.show("Order created");
@@ -104,17 +150,17 @@ export default function Index() {
         id: id,
         title: title,
         price: variants[0].price ?? "",
-        quantity: 1
+        quantity: 1,
       });
     }
   }
 
   const handleSave = () => {
     const data = {
-      ...form
+      ...form,
     };
     submit(data, { method: "post" });
-  }
+  };
 
   return (
     <Page>
@@ -133,10 +179,14 @@ export default function Index() {
                   <Text as="h3" variant="headingMd">
                     Lorem ipsum dolor sit amet consectetur adipisicing elit.
                   </Text>
-                  <Form onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSave()
-                  }}>
+                  <Form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSave();
+                    }}
+                    method="post"
+                    action="/app/automations"
+                  >
                     <BlockStack gap="600">
                       <FormLayout>
                         <Button onClick={selectProduct}>
@@ -150,7 +200,7 @@ export default function Index() {
                         </Text>
                       </FormLayout>
                       <Button loading={isLoading} submit>
-                        Generate a Order
+                        Generate a Ordere
                       </Button>
                     </BlockStack>
                   </Form>
